@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>Sevk</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Sevk</Authors>
+    <Company>Sevk</Company>
+    <Description>Official .NET SDK for the Sevk email platform</Description>
+    <PackageProjectUrl>https://sevk.io</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sevk-io/sevk-dotnet</RepositoryUrl>
+    <PackageTags>email;sdk;sevk;marketing</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RootNamespace>Sevk</RootNamespace>
+  </PropertyGroup>
+
+</Project>

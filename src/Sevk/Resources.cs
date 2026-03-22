@@ -29,6 +29,18 @@ public class ContactsResource
     public async Task DeleteAsync(string id) =>
         await _client.DeleteAsync($"/contacts/{id}");
 
+    public async Task<BulkUpdateContactsResponse> BulkUpdateAsync(List<BulkUpdateContactEntry> updates) =>
+        await _client.PatchAsync<BulkUpdateContactsResponse>("/contacts/bulk-update", new { contacts = updates });
+
+    public async Task<ImportContactsResponse> ImportAsync(ImportContactsRequest req) =>
+        await _client.PostAsync<ImportContactsResponse>("/contacts/import", req);
+
+    public async Task<ListResponse<ContactEvent>> GetEventsAsync(string id, ListParams? p = null)
+    {
+        var query = BuildQuery(p);
+        return await _client.GetAsync<ListResponse<ContactEvent>>($"/contacts/{id}/events{query}");
+    }
+
     private string BuildQuery(ListParams? p) =>
         p == null ? "" : $"?page={p.Page ?? 1}&limit={p.Limit ?? 20}" + (p.Search != null ? $"&search={p.Search}" : "");
 }
@@ -56,8 +68,17 @@ public class AudiencesResource
     public async Task AddContactsAsync(string id, List<string> contactIds) =>
         await _client.PostAsync<object>($"/audiences/{id}/contacts", new { contactIds });
 
+    public async Task RemoveContactAsync(string id, string contactId) =>
+        await _client.DeleteAsync($"/audiences/{id}/contacts/{contactId}");
+
     public async Task DeleteAsync(string id) =>
         await _client.DeleteAsync($"/audiences/{id}");
+
+    public async Task<ListResponse<Contact>> ListContactsAsync(string id, ListParams? p = null)
+    {
+        var query = p == null ? "" : $"?page={p.Page ?? 1}&limit={p.Limit ?? 20}";
+        return await _client.GetAsync<ListResponse<Contact>>($"/audiences/{id}/contacts{query}");
+    }
 }
 
 public class TemplatesResource
@@ -100,6 +121,42 @@ public class BroadcastsResource
 
     public async Task<Broadcast> GetAsync(string id) =>
         await _client.GetAsync<Broadcast>($"/broadcasts/{id}");
+
+    public async Task<BroadcastStatus> GetStatusAsync(string id) =>
+        await _client.GetAsync<BroadcastStatus>($"/broadcasts/{id}/status");
+
+    public async Task<ListResponse<BroadcastEmail>> GetEmailsAsync(string id, ListParams? p = null)
+    {
+        var query = p == null ? "" : $"?page={p.Page ?? 1}&limit={p.Limit ?? 20}";
+        return await _client.GetAsync<ListResponse<BroadcastEmail>>($"/broadcasts/{id}/emails{query}");
+    }
+
+    public async Task<BroadcastCostEstimate> EstimateCostAsync(string id) =>
+        await _client.GetAsync<BroadcastCostEstimate>($"/broadcasts/{id}/estimate-cost");
+
+    public async Task<ListResponse<Broadcast>> ListActiveAsync() =>
+        await _client.GetAsync<ListResponse<Broadcast>>("/broadcasts/active");
+
+    public async Task<Broadcast> CreateAsync(CreateBroadcastRequest req) =>
+        await _client.PostAsync<Broadcast>("/broadcasts", req);
+
+    public async Task<Broadcast> UpdateAsync(string id, UpdateBroadcastRequest req) =>
+        await _client.PatchAsync<Broadcast>($"/broadcasts/{id}", req);
+
+    public async Task DeleteAsync(string id) =>
+        await _client.DeleteAsync($"/broadcasts/{id}");
+
+    public async Task<Broadcast> SendAsync(string id) =>
+        await _client.PostAsync<Broadcast>($"/broadcasts/{id}/send");
+
+    public async Task<Broadcast> CancelAsync(string id) =>
+        await _client.PostAsync<Broadcast>($"/broadcasts/{id}/cancel");
+
+    public async Task<object> SendTestAsync(string id, List<string> emails) =>
+        await _client.PostAsync<object>($"/broadcasts/{id}/test", new { emails });
+
+    public async Task<object> GetAnalyticsAsync(string id) =>
+        await _client.GetAsync<object>($"/broadcasts/{id}/analytics");
 }
 
 public class DomainsResource
@@ -112,6 +169,27 @@ public class DomainsResource
         var query = verified.HasValue ? $"?verified={verified.Value.ToString().ToLower()}" : "";
         return await _client.GetAsync<DomainsResponse>($"/domains{query}");
     }
+
+    public async Task<Domain> GetAsync(string id) =>
+        await _client.GetAsync<Domain>($"/domains/{id}");
+
+    public async Task<Domain> CreateAsync(CreateDomainRequest req) =>
+        await _client.PostAsync<Domain>("/domains", req);
+
+    public async Task<Domain> UpdateAsync(string id, UpdateDomainRequest req) =>
+        await _client.PatchAsync<Domain>($"/domains/{id}", req);
+
+    public async Task DeleteAsync(string id) =>
+        await _client.DeleteAsync($"/domains/{id}");
+
+    public async Task<Domain> VerifyAsync(string id) =>
+        await _client.PostAsync<Domain>($"/domains/{id}/verify");
+
+    public async Task<DnsRecordsResponse> GetDnsRecordsAsync(string id) =>
+        await _client.GetAsync<DnsRecordsResponse>($"/domains/{id}/dns-records");
+
+    public async Task<RegionsResponse> GetRegionsAsync() =>
+        await _client.GetAsync<RegionsResponse>("/domains/regions");
 }
 
 public class TopicsResource
@@ -136,6 +214,18 @@ public class TopicsResource
 
     public async Task DeleteAsync(string audienceId, string id) =>
         await _client.DeleteAsync($"/audiences/{audienceId}/topics/{id}");
+
+    public async Task AddContactsAsync(string audienceId, string topicId, List<string> contactIds) =>
+        await _client.PostAsync<object>($"/audiences/{audienceId}/topics/{topicId}/contacts", new { contactIds });
+
+    public async Task RemoveContactAsync(string audienceId, string topicId, string contactId) =>
+        await _client.DeleteAsync($"/audiences/{audienceId}/topics/{topicId}/contacts/{contactId}");
+
+    public async Task<ListResponse<Contact>> ListContactsAsync(string audienceId, string topicId, ListParams? p = null)
+    {
+        var query = p == null ? "" : $"?page={p.Page ?? 1}&limit={p.Limit ?? 20}";
+        return await _client.GetAsync<ListResponse<Contact>>($"/audiences/{audienceId}/topics/{topicId}/contacts{query}");
+    }
 }
 
 public class SegmentsResource
@@ -160,6 +250,12 @@ public class SegmentsResource
 
     public async Task DeleteAsync(string audienceId, string id) =>
         await _client.DeleteAsync($"/audiences/{audienceId}/segments/{id}");
+
+    public async Task<SegmentCalculateResponse> CalculateAsync(string audienceId, string id) =>
+        await _client.GetAsync<SegmentCalculateResponse>($"/audiences/{audienceId}/segments/{id}/calculate");
+
+    public async Task<SegmentCalculateResponse> PreviewAsync(string audienceId, CreateSegmentRequest req) =>
+        await _client.PostAsync<SegmentCalculateResponse>($"/audiences/{audienceId}/segments/preview", req);
 }
 
 public class SubscriptionsResource
@@ -179,6 +275,66 @@ public class EmailsResource
     private readonly SevkClient _client;
     public EmailsResource(SevkClient client) => _client = client;
 
+    /// <summary>
+    /// Send an email with optional attachments (max 10, 10MB total)
+    /// </summary>
     public async Task<Email> SendAsync(SendEmailRequest req) =>
         await _client.PostAsync<Email>("emails", req);
+
+    /// <summary>
+    /// Send multiple emails in bulk (max 100)
+    /// </summary>
+    public async Task<BulkEmailResponse> SendBulkAsync(BulkEmailRequest req) =>
+        await _client.PostAsync<BulkEmailResponse>("emails/bulk", req);
+
+    public async Task<Email> GetAsync(string id) =>
+        await _client.GetAsync<Email>($"emails/{id}");
+}
+
+public class WebhooksResource
+{
+    private readonly SevkClient _client;
+    public WebhooksResource(SevkClient client) => _client = client;
+
+    public async Task<ListResponse<Webhook>> ListAsync(ListParams? p = null)
+    {
+        var query = p == null ? "" : $"?page={p.Page ?? 1}&limit={p.Limit ?? 20}" + (p?.Search != null ? $"&search={p.Search}" : "");
+        return await _client.GetAsync<ListResponse<Webhook>>($"/webhooks{query}");
+    }
+
+    public async Task<Webhook> GetAsync(string id) =>
+        await _client.GetAsync<Webhook>($"/webhooks/{id}");
+
+    public async Task<Webhook> CreateAsync(CreateWebhookRequest req) =>
+        await _client.PostAsync<Webhook>("/webhooks", req);
+
+    public async Task<Webhook> UpdateAsync(string id, UpdateWebhookRequest req) =>
+        await _client.PatchAsync<Webhook>($"/webhooks/{id}", req);
+
+    public async Task DeleteAsync(string id) =>
+        await _client.DeleteAsync($"/webhooks/{id}");
+
+    public async Task<WebhookTestResponse> TestAsync(string id) =>
+        await _client.PostAsync<WebhookTestResponse>($"/webhooks/{id}/test");
+
+    public async Task<WebhookEventsResponse> ListEventsAsync() =>
+        await _client.GetAsync<WebhookEventsResponse>("/webhooks/events");
+}
+
+public class EventsResource
+{
+    private readonly SevkClient _client;
+    public EventsResource(SevkClient client) => _client = client;
+
+    public async Task<ListResponse<Event>> ListAsync(ListParams? p = null, string? type = null, string? from = null, string? to = null)
+    {
+        var query = p == null ? "" : $"?page={p.Page ?? 1}&limit={p.Limit ?? 20}";
+        if (type != null) query += (query == "" ? "?" : "&") + $"type={type}";
+        if (from != null) query += (query == "" ? "?" : "&") + $"from={from}";
+        if (to != null) query += (query == "" ? "?" : "&") + $"to={to}";
+        return await _client.GetAsync<ListResponse<Event>>($"/events{query}");
+    }
+
+    public async Task<EventStats> StatsAsync() =>
+        await _client.GetAsync<EventStats>("/events/stats");
 }

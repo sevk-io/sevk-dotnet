@@ -1,7 +1,3 @@
-> [!WARNING]
-> Sevk is currently in private beta. This SDK is not yet available for public use.
-> Join the waitlist at [sevk.io](https://sevk.io) to get early access.
-
 <p align="center">
   <img src="https://sevk.io/logo.png" alt="Sevk" width="120" />
 </p>
@@ -47,7 +43,7 @@ using Sevk.Markup;
 
 var sevk = new SevkClient("your-api-key");
 
-var html = MarkupRenderer.Render(@"
+var html = Renderer.Render(@"
   <section padding=""40px 20px"" background-color=""#f8f9fa"">
     <container max-width=""600px"">
       <heading level=""1"" color=""#1a1a1a"">Welcome!</heading>

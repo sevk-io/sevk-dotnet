@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Sevk</PackageId>
-    <Version>0.1.0</Version>
+    <Version>1.0.0</Version>
     <Authors>Sevk</Authors>
     <Company>Sevk</Company>
     <Description>Official .NET SDK for the Sevk email platform</Description>
@@ -15,5 +15,9 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RootNamespace>Sevk</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ColorCode.HTML" Version="2.0.15" />
+  </ItemGroup>
 
 </Project>

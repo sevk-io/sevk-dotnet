@@ -53,6 +53,8 @@ public class SevkClient : IDisposable
     public SegmentsResource Segments { get; }
     public SubscriptionsResource Subscriptions { get; }
     public EmailsResource Emails { get; }
+    public WebhooksResource Webhooks { get; }
+    public EventsResource Events { get; }
 
     public SevkClient(string apiKey, SevkOptions? options = null)
     {
@@ -87,6 +89,8 @@ public class SevkClient : IDisposable
         Segments = new SegmentsResource(this);
         Subscriptions = new SubscriptionsResource(this);
         Emails = new EmailsResource(this);
+        Webhooks = new WebhooksResource(this);
+        Events = new EventsResource(this);
     }
 
     private string BuildUrl(string path)
@@ -146,6 +150,14 @@ public class SevkClient : IDisposable
             var content = await response.Content.ReadAsStringAsync();
             throw new SevkException($"{(int)response.StatusCode}: {content}", (int)response.StatusCode);
         }
+    }
+
+    /// <summary>
+    /// Get project usage and limits
+    /// </summary>
+    public async Task<JsonDocument> GetUsageAsync()
+    {
+        return await GetAsync<JsonDocument>("/limits");
     }
 
     public void Dispose()
